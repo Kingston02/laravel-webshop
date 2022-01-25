@@ -1,4 +1,4 @@
-<!-- @extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
 <div class="container">
@@ -7,20 +7,21 @@
             <div class="card my-4">
                 <div class="card-header">Checkout page:</div>
 
-                @foreach($items as $item)
-                    <p>{{ $item-> }}</p>
+                @foreach($orders as $order)
                     <ul>
                         <div class="form-row">
-                            <h4 class='items-group'>{{ $item }}</h4>
+                        @foreach($order->cart->items as $order)
+                            <h4 class='items-group'>{{ $item['name'] }}</h4>
+                            @endforeach
                         </div>
                     </ul>
                 @endforeach
 
                 <hr>
-                Totaal prijs: €{{ $priceTot }},-
+
             </div>
         </div>
     </div>
 </div>
 </div>
-@endsection -->
+@endsection

@@ -14,7 +14,7 @@
                     <p>{{ $prod->description }}</p>
                     <h1>€{{ $prod->price }},-</h1>
                     
-                    <p class="btn-holder"><a href="{{ url('add-to-cart/'.$prod->id) }}" class="btn btn-warning btn-block text-center" role="button">Add to cart</a> </p>
+                    <p class="btn-holder"><a href="{{ route('cart') }}" class="btn btn-warning btn-block text-center" role="button">Add to cart</a> </p>
                 </div>
 
             @endforeach

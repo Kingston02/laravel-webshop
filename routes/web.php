@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,7 +28,7 @@ Route::get('/products/product/{productId}', 'ProductController@index');
 
 Route::get('/add-to-cart/{productId}', 'CartController@addToCart');
 
-Route::get('/cart', 'CartController@getCart');
+Route::get('/cart', 'CartController@getCart')->name('cart');
 
 Route::get('/filter/{categoryId}', 'ProductsController@filter');
 
