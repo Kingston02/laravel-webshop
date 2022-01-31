@@ -1,6 +1,5 @@
 <?php
 namespace App;
-
 use App\Product;
 use App\Products;
 use Illuminate\Http\Request;
@@ -11,38 +10,41 @@ class Cart
     public $sessionQty = 0;
     public $totalPrice = 0;
 
-
     /**
      * Check if cart items in session.
      */
     public function __construct(Request $request)
     {
-        $oldCart = $request->session()->has('cart') ? $request->session()->get('cart') : null;
-//        $oldCart = Session::has('cart') ? Session::get('cart') : null;
-        //check if oldCart does exist
-        //if it does exist items will be equal to oldCart items
+        if($request->session()->has('cart') == True){
+            $oldCart = $request->session()->get('cart');
+        } else {
+            $oldCart = null;
+        }
+
         if ($oldCart) {
             $this->items = $oldCart->items;
             $this->sessionQty = $oldCart->sessionQty;
             $this->totalPrice = $oldCart->totalPrice;
         }
+
         $this->save();
-        dd();
     }
 
     /**
      * Save func
      */
-    public function save()
-    {
-        session()->put('cart', $this);
+    public function save() {
+        if (count($this->items) > 0) {
+            session()->put('cart', $this);
+        } else {
+            session()->forget('cart');
+        }
     }
 
     /**
      * Add a product to cart
      */
-    public function addToCart($item, $productId)
-    {
+    public function addToCart($item, $productId){
         $storedItem = ['qty' => 0, 'price' => $item->price, 'item' => $item];
         if ($this->items) {
             if (array_key_exists($productId, $this->items)) {
@@ -54,35 +56,29 @@ class Cart
         $this->items[$productId] = $storedItem;
         $this->sessionQty++;
         $this->totalPrice += $item->price;
-//        dd($this->items);
+
         $this->save();
     }
 
-     /**
+    /**
      * Get the items that
      */
     public function getCart($itemsId, $totalPrice){
         if(count($itemsId) > 0){
             $productIdArr = [];
-            foreach(array_keys($itemsId) as $productId)
-            {
+            foreach(array_keys($itemsId) as $productId){
                 array_push($productIdArr, $productId);
             }
             $products = Product::whereIn('id', $productIdArr)->get();
         }
 
-
         return ['items' => $products, 'priceTot' => $totalPrice];
     }
-
-
 
     /**
      * Update qty from cart
      */
-    public
-    function updateCart($productId, $qtyNew)
-    {
+    public function updateCart($productId, $qtyNew){
 
         $qtyOld = $this->items[$productId]['qty'];
         $priceTot = $this->items[$productId]['price'];
@@ -91,11 +87,11 @@ class Cart
         //oldcart qty * price
         $oldCartTot = $pricePs * $qtyOld;
         //newcart qty * price
-        $newPriceTot = $pricePs * intval($qtyNew);
+        $newPrieTot = $pricePs * intval($qtyNew);
         $removeCartTot = $this->totalPrice -= $oldCartTot;
         //totaal price + totaal product qty
-        $newPricingTot = $this->totalPrice + $newPriceTot;
-        $this->items[$productId]['price'] = $newPriceTot;
+        $newPricingTot = $this->totalPrice + $newPrieTot;
+        $this->items[$productId]['price'] = $newPrieTot;
         $this->items[$productId]['qty'] = intval($qtyNew);
         //change total price to new generated total price
         $this->totalPrice = $newPricingTot;
@@ -106,9 +102,7 @@ class Cart
     /**
      * Remove item from cart
      */
-    public
-    function removeCart($productId)
-    {
+    public function removeCart($productId){
         $qty = $this->items[$productId]['qty'];
         $price = $this->items[$productId]['price'];
         $itemTotPrice = $qty * $price;
@@ -118,4 +112,20 @@ class Cart
 
         $this->save();
     }
+
+    /**
+     * Get the items that
+     */
+    public function checkout(){
+        if(count($itemsId) > 0){
+            $productIdArr = [];
+            foreach(array_keys($itemsId) as $productId){
+                array_push($productIdArr, $productId);
+            }
+            $products = Product::whereIn('id', $productIdArr)->get();
+        }
+
+        return ['items' => $products, 'priceTot' => $totalPrice];
+    }
+
 }
